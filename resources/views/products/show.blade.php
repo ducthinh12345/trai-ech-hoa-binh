@@ -38,7 +38,11 @@
                 </div>
                 @if ($product->short_description)<p class="mt-5 text-[15.5px] leading-7 text-ink/80">{{ $product->short_description }}</p>@endif
 
-                <div class="mt-6"><livewire:add-to-cart :product="$product" /></div>
+                @staticdemo
+                    @include('products.partials.static-price')
+                @else
+                    <div class="mt-6"><livewire:add-to-cart :product="$product" /></div>
+                @endstaticdemo
 
                 <div class="mt-6 flex items-center gap-3">
                     @auth

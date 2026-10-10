@@ -15,7 +15,7 @@ class SitemapController extends Controller
     public function index(): Response
     {
         /* Cache 1 giờ: sitemap bị bot gọi thường xuyên, dữ liệu không cần tức thời. */
-        $xml = Cache::remember('sitemap.xml', 3600, function (): string {
+        $xml = Cache::remember(self::cacheKey(), 3600, function (): string {
             $urls = collect([
                 ['loc' => url('/'), 'lastmod' => now(), 'priority' => '1.0', 'changefreq' => 'daily'],
                 ['loc' => route('products.index'), 'lastmod' => now(), 'priority' => '0.9', 'changefreq' => 'daily'],
@@ -35,6 +35,14 @@ class SitemapController extends Controller
         });
 
         return response($xml, 200, ['Content-Type' => 'application/xml; charset=UTF-8']);
+    }
+
+    /**
+     * Khoá cache theo root URL: sitemap chứa URL tuyệt đối, site thật và bản demo (domain khác) không được dùng chung.
+     */
+    public static function cacheKey(): string
+    {
+        return 'sitemap.xml:'.md5(url('/'));
     }
 
     public function robots(): Response

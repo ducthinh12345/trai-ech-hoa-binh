@@ -32,6 +32,7 @@
         @endforeach
     </ul>
 </div>
+@unless (config('app.static_demo'))
 <form method="GET" class="card space-y-4 p-5">
     @if (request('q'))<input type="hidden" name="q" value="{{ request('q') }}">@endif
     @if (request('sort'))<input type="hidden" name="sort" value="{{ request('sort') }}">@endif
@@ -49,4 +50,4 @@
         @if (request()->hasAny(['min', 'max', 'in_stock']))<a href="{{ url()->current() }}" class="btn-ghost">Xoá</a>@endif
     </div>
 </form>
-
+@endunless

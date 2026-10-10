@@ -22,7 +22,7 @@ class ProductController extends Controller
 
     public function index(Request $request): View
     {
-        $products = $this->filteredQuery($request)->paginate(12)->withQueryString();
+        $products = $this->filteredQuery($request)->paginate(self::perPage(12))->withQueryString();
         $term = trim((string) $request->query('q'));
 
         $seo = Seo::make($term !== '' ? "Tìm kiếm: {$term}" : 'Tất cả sản phẩm', 'Mua ếch giống, ếch thịt, ếch sống và thịt ếch làm sạch chất lượng, giao tận nơi toàn quốc.')
@@ -51,7 +51,7 @@ class ProductController extends Controller
         abort_unless($category->is_active, 404);
 
         $categoryIds = $category->children()->where('is_active', true)->pluck('id')->push($category->id);
-        $products = $this->filteredQuery($request)->whereIn('category_id', $categoryIds)->paginate(12)->withQueryString();
+        $products = $this->filteredQuery($request)->whereIn('category_id', $categoryIds)->paginate(self::perPage(12))->withQueryString();
 
         $crumbs = [['name' => 'Trang chủ', 'url' => url('/')], ['name' => 'Sản phẩm', 'url' => route('products.index')]];
         if ($category->parent) {
@@ -187,5 +187,13 @@ class ProductController extends Controller
             ->withCount(['products' => fn ($q) => $q->published()])
             ->get()
             ->each(fn (Category $c) => $c->products_count += $c->children()->active()->withCount(['products' => fn ($q) => $q->published()])->get()->sum('products_count'));
+    }
+
+    /**
+     * Bản demo tĩnh không phân trang được bằng query string nên hiện tất cả trên một trang.
+     */
+    private static function perPage(int $default): int
+    {
+        return config('app.static_demo') ? 1000 : $default;
     }
 }

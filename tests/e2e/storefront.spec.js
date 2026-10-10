@@ -1,6 +1,8 @@
 import { test, expect } from '@playwright/test';
 import { shot, watchErrors } from './helpers.js';
 
+test.skip(!!process.env.STATIC_BASE_URL, 'Đang kiểm bản tĩnh');
+
 test('header: dropdown danh mục (desktop) / menu trượt (mobile)', async ({ page }, testInfo) => {
     const errs = watchErrors(page);
     await page.goto('/');

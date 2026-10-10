@@ -52,7 +52,11 @@
                 </p>
             </div>
             <div class="relative z-10">
-                <livewire:quick-add :product="$product" :key="'qa-'.$product->id" />
+                @staticdemo
+                    <a href="{{ $product->url() }}" class="grid size-10 place-items-center rounded-full bg-brand-700 text-white shadow-sm transition hover:scale-110 hover:bg-brand-800" aria-label="Xem {{ $product->name }}"><x-heroicon-m-arrow-right class="size-5" /></a>
+                @else
+                    <livewire:quick-add :product="$product" :key="'qa-'.$product->id" />
+                @endstaticdemo
             </div>
         </div>
     </div>

@@ -2,10 +2,11 @@
     /* Cache dạng mảng thuần: cấu hình cache chặn unserialize object nên không cache model trực tiếp. */
     $menuCategories = collect(\Illuminate\Support\Facades\Cache::remember('menu.categories', 600, fn () => \App\Models\Category::query()->inMenu()->root()
         ->with(['children' => fn ($q) => $q->inMenu()])->get()
-        ->map(fn ($c) => ['name' => $c->name, 'slug' => $c->slug, 'url' => $c->url(), 'children' => $c->children->map(fn ($ch) => ['name' => $ch->name, 'slug' => $ch->slug, 'url' => $ch->url()])->all()])
+        ->map(fn ($c) => ['name' => $c->name, 'slug' => $c->slug, 'children' => $c->children->map(fn ($ch) => ['name' => $ch->name, 'slug' => $ch->slug])->all()])
         ->all()))->map(fn ($c) => (object) [
-            'name' => $c['name'], 'slug' => $c['slug'], 'url' => $c['url'],
-            'children' => collect($c['children'])->map(fn ($ch) => (object) $ch),
+            /* Chỉ cache slug, URL sinh lúc render: cùng cache dùng được cho site thật lẫn bản demo khác domain. */
+            'name' => $c['name'], 'slug' => $c['slug'], 'url' => route('categories.show', $c['slug']),
+            'children' => collect($c['children'])->map(fn ($ch) => (object) [...$ch, 'url' => route('categories.show', $ch['slug'])]),
             /* Mục cha sáng khi đang ở chính nó hoặc ở một danh mục con. */
             'isActive' => collect([$c['slug'], ...array_column($c['children'], 'slug')])->contains(fn ($slug) => request()->is('danh-muc/'.$slug)),
         ]);
@@ -39,6 +40,9 @@
                 @endif
             </a>
 
+            @staticdemo
+            <div class="hidden flex-1 md:block"></div>
+            @else
             <form action="{{ route('products.index') }}" method="GET" role="search" class="relative hidden flex-1 md:block">
                 <label for="header-search" class="sr-only">Tìm sản phẩm</label>
                 <input id="header-search" type="search" name="q" value="{{ request('q') }}" placeholder="Tìm ếch giống, thịt ếch, ếch sống..."
@@ -47,6 +51,7 @@
                     <x-heroicon-o-magnifying-glass class="size-4.5" />
                 </button>
             </form>
+            @endstaticdemo
 
             <div class="ml-auto flex items-center gap-1 sm:gap-2">
                 <a href="tel:{{ preg_replace('/\D/', '', $phone) }}" class="hidden items-center gap-2.5 rounded-full py-1.5 pr-4 pl-1.5 hover:bg-brand-50 xl:flex">
@@ -56,6 +61,9 @@
                         <span class="block text-sm font-bold text-brand-900">{{ $phone }}</span>
                     </span>
                 </a>
+                @staticdemo
+                <a href="https://zalo.me/{{ preg_replace('/\D/', '', (string) setting('store_zalo', setting('store_phone'))) }}" target="_blank" rel="noopener" class="btn-primary px-4 py-2 whitespace-nowrap"><span class="sm:hidden">Zalo</span><span class="hidden sm:inline">Nhắn Zalo đặt hàng</span></a>
+                @else
                 <button type="button" @click="searchOpen = !searchOpen" class="grid size-10 place-items-center rounded-full text-brand-900 hover:bg-brand-50 md:hidden" aria-label="Tìm kiếm">
                     <x-heroicon-o-magnifying-glass class="size-6" />
                 </button>
@@ -69,14 +77,17 @@
                     </a>
                 @endauth
                 <livewire:cart-counter />
+                @endstaticdemo
             </div>
         </div>
 
+        @unless (config('app.static_demo'))
         <div x-show="searchOpen" x-collapse x-cloak class="border-t border-brand-900/5 md:hidden">
             <form action="{{ route('products.index') }}" method="GET" role="search" class="container-x py-3">
                 <input type="search" name="q" value="{{ request('q') }}" placeholder="Bạn cần tìm gì?" class="input rounded-full" x-ref="mobileSearch">
             </form>
         </div>
+        @endunless
 
         <nav class="hidden border-t border-brand-900/5 lg:block" aria-label="Danh mục chính">
             <div class="container-x flex items-center gap-0.5 text-sm font-semibold whitespace-nowrap">
@@ -112,9 +123,11 @@
                 @endforeach
                 <a href="{{ route('posts.index') }}" class="hidden px-3 py-3 text-brand-900 hover:text-brand-600 xl:block">Kiến thức</a>
                 <a href="{{ route('contact') }}" class="hidden px-3 py-3 text-brand-900 hover:text-brand-600 xl:block">Liên hệ</a>
+@unless (config('app.static_demo'))
                 <a href="{{ route('orders.track') }}" class="ml-auto flex items-center gap-1.5 px-3 py-3 text-brand-700 hover:text-brand-500">
                     <x-heroicon-o-truck class="size-4.5" /> Tra cứu đơn hàng
                 </a>
+                @endunless
             </div>
         </nav>
     </div>
@@ -152,13 +165,15 @@
                 @endforeach
                 <div class="my-3 border-t border-brand-900/5"></div>
                 <a href="{{ route('posts.index') }}" class="flex items-center gap-3 rounded-xl px-3 py-3 text-brand-900 hover:bg-brand-50"><x-heroicon-o-book-open class="size-5 text-brand-500" />Kiến thức nuôi ếch</a>
-                <a href="{{ route('orders.track') }}" class="flex items-center gap-3 rounded-xl px-3 py-3 text-brand-900 hover:bg-brand-50"><x-heroicon-o-truck class="size-5 text-brand-500" />Tra cứu đơn hàng</a>
+@unless (config('app.static_demo'))                <a href="{{ route('orders.track') }}" class="flex items-center gap-3 rounded-xl px-3 py-3 text-brand-900 hover:bg-brand-50"><x-heroicon-o-truck class="size-5 text-brand-500" />Tra cứu đơn hàng</a>@endunless
                 <a href="{{ route('contact') }}" class="flex items-center gap-3 rounded-xl px-3 py-3 text-brand-900 hover:bg-brand-50"><x-heroicon-o-chat-bubble-left-right class="size-5 text-brand-500" />Liên hệ</a>
+                @unless (config('app.static_demo'))
                 @auth
                     <a href="{{ route('account.index') }}" class="flex items-center gap-3 rounded-xl px-3 py-3 text-brand-900 hover:bg-brand-50"><x-heroicon-o-user-circle class="size-5 text-brand-500" />Tài khoản của tôi</a>
                 @else
                     <a href="{{ route('login') }}" class="flex items-center gap-3 rounded-xl px-3 py-3 text-brand-900 hover:bg-brand-50"><x-heroicon-o-user-circle class="size-5 text-brand-500" />Đăng nhập / Đăng ký</a>
                 @endauth
+                @endunless
             </nav>
             <a href="tel:{{ preg_replace('/\D/', '', $phone) }}" class="m-4 mb-[max(1rem,env(safe-area-inset-bottom))] flex shrink-0 items-center justify-center gap-2 rounded-2xl bg-accent-400 py-3.5 font-bold text-brand-950">
                 <x-heroicon-s-phone class="size-5" /> Gọi {{ $phone }}

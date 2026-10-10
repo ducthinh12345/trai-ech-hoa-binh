@@ -39,8 +39,29 @@ so số tiền và idempotent. Server production cần HTTPS và URL công khai 
 - Cấu hình `MAIL_*` để gửi email xác nhận đơn.
 - Gửi `https://<domain>/sitemap.xml` trong Google Search Console.
 
+## Demo tĩnh trên GitHub Pages
+
+GitHub Pages chỉ phục vụ file tĩnh nên **không chạy được giỏ hàng, thanh toán, form, tài khoản và admin**.
+Workflow `.github/workflows/pages.yml` dựng site bằng SQLite + dữ liệu mẫu ở chế độ `STATIC_DEMO=true`
+(các tính năng trên được thay bằng nút gọi/Zalo), xuất HTML bằng `php artisan site:export` rồi đăng lên
+`https://<chủ-repo>.github.io/<tên-repo>/` mỗi khi push vào `main`.
+
+Bật một lần: **Settings → Pages → Build and deployment → Source: GitHub Actions**.
+
+Xuất thử trên máy:
+
+```bash
+STATIC_DEMO=true APP_URL=http://127.0.0.1:8090/trai-ech-hoa-binh php artisan serve --port=8010 &
+STATIC_DEMO=true APP_URL=http://127.0.0.1:8090/trai-ech-hoa-binh php artisan site:export --source=http://127.0.0.1:8010
+# phục vụ dist/ dưới đường dẫn /trai-ech-hoa-binh/ rồi kiểm:
+STATIC_BASE_URL=http://127.0.0.1:8090/trai-ech-hoa-binh/ npx playwright test static-site
+```
+
+Bản bán hàng thật cần server PHP 8.3 + MySQL (VPS, cPanel...) — xem mục "Lên production".
+
 ## Test
 
 ```bash
 php artisan test --compact    # SQLite in-memory, không đụng DB dev
+npm run test:e2e              # Playwright trên site dev đang chạy (desktop + mobile), ảnh ở tests/e2e/screenshots
 ```

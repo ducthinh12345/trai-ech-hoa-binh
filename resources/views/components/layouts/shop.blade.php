@@ -17,7 +17,7 @@
     <title>{{ $seo->fullTitle() }}</title>
     <meta name="description" content="{{ $seo->metaDescription() }}">
     <link rel="canonical" href="{{ $seo->canonicalUrl() }}">
-    @if ($seo->noindex || setting('seo_noindex_site'))
+    @if ($seo->noindex || setting('seo_noindex_site') || config('app.static_demo'))
         <meta name="robots" content="noindex, follow">
     @else
         <meta name="robots" content="index, follow, max-image-preview:large">
@@ -61,6 +61,11 @@
 <body class="flex min-h-full flex-col">
     <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded-lg focus:bg-white focus:px-4 focus:py-2">Bỏ qua tới nội dung chính</a>
 
+    @staticdemo
+        <div class="bg-accent-300 text-center text-xs font-semibold text-brand-950 sm:text-sm">
+            <div class="container-x py-2"><span class="hidden sm:inline">Bản xem thử (demo tĩnh) — để đặt hàng vui lòng gọi</span><span class="sm:hidden">Bản demo — đặt hàng gọi</span> <a href="tel:{{ preg_replace('/\D/', '', setting('store_phone', '')) }}" class="underline">{{ setting('store_phone') }}</a> hoặc nhắn Zalo.</div>
+        </div>
+    @endstaticdemo
     @include('partials.header')
 
     <main id="main" class="flex-1 pb-20 lg:pb-0">

@@ -23,6 +23,15 @@
                     @endif
                 @endforeach
             </div>
+            @staticdemo
+            <div class="card flex flex-col items-center justify-center gap-4 p-8 text-center lg:col-span-3">
+                <p class="text-lg font-bold">Liên hệ nhanh nhất qua điện thoại hoặc Zalo</p>
+                <div class="flex flex-wrap justify-center gap-3">
+                    <a href="tel:{{ preg_replace('/\D/', '', setting('store_phone', '')) }}" class="btn-primary btn-lg"><x-heroicon-s-phone class="size-5" /> {{ setting('store_phone') }}</a>
+                    <a href="https://zalo.me/{{ preg_replace('/\D/', '', (string) setting('store_zalo', setting('store_phone'))) }}" target="_blank" rel="noopener" class="btn-outline btn-lg">Nhắn Zalo</a>
+                </div>
+            </div>
+            @else
             <form action="{{ route('contact.send') }}" method="POST" class="card grid gap-4 p-6 sm:grid-cols-2 sm:p-8 lg:col-span-3">
                 @csrf
                 <div class="hidden"><input type="text" name="website" tabindex="-1" autocomplete="off"></div>
@@ -37,6 +46,7 @@
                 <div class="sm:col-span-2"><label for="c-msg" class="label">Nội dung *</label><textarea id="c-msg" name="message" rows="5" required class="input">{{ old('message') }}</textarea>@error('message')<p class="field-error">{{ $message }}</p>@enderror</div>
                 <button class="btn-primary btn-lg sm:col-span-2">Gửi liên hệ</button>
             </form>
+            @endstaticdemo
         </div>
 
         @if ($map = setting('store_map_embed'))

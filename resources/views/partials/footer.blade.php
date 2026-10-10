@@ -1,11 +1,12 @@
 @php
-    $footerPages = \Illuminate\Support\Facades\Cache::remember('footer.pages', 600, fn () => \App\Models\Page::query()->published()->where('show_in_footer', true)->orderBy('sort_order')->get(['title', 'slug'])->map(fn ($p) => ['title' => $p->title, 'url' => $p->url()])->all());
-    $footerCategories = \Illuminate\Support\Facades\Cache::remember('footer.categories', 600, fn () => \App\Models\Category::query()->active()->root()->orderBy('sort_order')->limit(6)->get(['name', 'slug'])->map(fn ($c) => ['name' => $c->name, 'url' => $c->url()])->all());
+    $footerPages = \Illuminate\Support\Facades\Cache::remember('footer.pages', 600, fn () => \App\Models\Page::query()->published()->where('show_in_footer', true)->orderBy('sort_order')->get(['title', 'slug'])->map(fn ($p) => ['title' => $p->title, 'slug' => $p->slug])->all());
+    $footerCategories = \Illuminate\Support\Facades\Cache::remember('footer.categories', 600, fn () => \App\Models\Category::query()->active()->root()->orderBy('sort_order')->limit(6)->get(['name', 'slug'])->map(fn ($c) => ['name' => $c->name, 'slug' => $c->slug])->all());
 @endphp
 <footer class="relative mt-20 overflow-hidden bg-brand-950 text-brand-100">
     <svg class="pointer-events-none absolute -top-px left-0 w-full text-cream" viewBox="0 0 1440 48" fill="currentColor" preserveAspectRatio="none" aria-hidden="true"><path d="M0 0h1440v16c-180 24-360 32-540 24S540 8 360 12 120 32 0 28z"/></svg>
 
     <div class="container-x relative pt-20 pb-10">
+        @unless (config('app.static_demo'))
         <div class="mb-12 grid items-center gap-6 rounded-3xl bg-brand-900/60 p-6 ring-1 ring-white/10 sm:p-8 lg:grid-cols-2">
             <div>
                 <h2 class="text-xl font-extrabold text-white sm:text-2xl">Nhận bảng giá ếch giống & ưu đãi mỗi tuần</h2>
@@ -18,6 +19,7 @@
                 <button class="btn-accent shrink-0">Đăng ký</button>
             </form>
         </div>
+        @endunless
 
         <div class="grid gap-10 sm:grid-cols-2 lg:grid-cols-12">
             <div class="lg:col-span-4">
@@ -39,7 +41,7 @@
                 <h3 class="text-sm font-bold tracking-wider text-white uppercase">Sản phẩm</h3>
                 <ul class="mt-4 space-y-2.5 text-sm">
                     @foreach ($footerCategories as $cat)
-                        <li><a href="{{ $cat['url'] }}" class="text-brand-200 transition hover:text-accent-300">{{ $cat['name'] }}</a></li>
+                        <li><a href="{{ route('categories.show', $cat['slug']) }}" class="text-brand-200 transition hover:text-accent-300">{{ $cat['name'] }}</a></li>
                     @endforeach
                 </ul>
             </div>
@@ -47,11 +49,11 @@
             <div class="lg:col-span-2">
                 <h3 class="text-sm font-bold tracking-wider text-white uppercase">Hỗ trợ</h3>
                 <ul class="mt-4 space-y-2.5 text-sm">
-                    <li><a href="{{ route('orders.track') }}" class="text-brand-200 hover:text-accent-300">Tra cứu đơn hàng</a></li>
+                    @unless (config('app.static_demo'))<li><a href="{{ route('orders.track') }}" class="text-brand-200 hover:text-accent-300">Tra cứu đơn hàng</a></li>@endunless
                     <li><a href="{{ route('posts.index') }}" class="text-brand-200 hover:text-accent-300">Kiến thức nuôi ếch</a></li>
                     <li><a href="{{ route('contact') }}" class="text-brand-200 hover:text-accent-300">Liên hệ & FAQ</a></li>
                     @foreach ($footerPages as $page)
-                        <li><a href="{{ $page['url'] }}" class="text-brand-200 hover:text-accent-300">{{ $page['title'] }}</a></li>
+                        <li><a href="{{ route('pages.show', $page['slug']) }}" class="text-brand-200 hover:text-accent-300">{{ $page['title'] }}</a></li>
                     @endforeach
                 </ul>
             </div>

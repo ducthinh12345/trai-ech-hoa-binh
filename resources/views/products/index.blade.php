@@ -9,6 +9,7 @@
             </div>
             <div class="flex items-center gap-2">
                 <button type="button" @click="filtersOpen = true" class="btn-outline lg:hidden"><x-heroicon-o-funnel class="size-4" /> Bộ lọc</button>
+                @unless (config('app.static_demo'))
                 <form method="GET" class="flex items-center gap-2">
                     @foreach (request()->except(['sort', 'page']) as $k => $v)<input type="hidden" name="{{ $k }}" value="{{ $v }}">@endforeach
                     <label for="sort" class="hidden text-sm text-gray-500 sm:block">Sắp xếp</label>
@@ -16,6 +17,7 @@
                         @foreach ($sorts as $value => $label)<option value="{{ $value }}" @selected(request('sort', 'popular') === $value)>{{ $label }}</option>@endforeach
                     </select>
                 </form>
+                @endunless
             </div>
         </div>
 

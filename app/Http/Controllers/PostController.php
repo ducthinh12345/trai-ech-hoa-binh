@@ -17,7 +17,7 @@ class PostController extends Controller
 
         return view('posts.index', [
             'seo' => $seo,
-            'posts' => Post::query()->published()->with('category')->paginate(9),
+            'posts' => Post::query()->published()->with('category')->paginate(self::perPage(9)),
             'category' => null,
             'categories' => PostCategory::query()->orderBy('sort_order')->withCount(['posts' => fn ($q) => $q->published()])->get(),
         ]);
@@ -34,7 +34,7 @@ class PostController extends Controller
 
         return view('posts.index', [
             'seo' => $seo,
-            'posts' => $postCategory->posts()->published()->with('category')->paginate(9),
+            'posts' => $postCategory->posts()->published()->with('category')->paginate(self::perPage(9)),
             'category' => $postCategory,
             'categories' => PostCategory::query()->orderBy('sort_order')->withCount(['posts' => fn ($q) => $q->published()])->get(),
         ]);
@@ -75,5 +75,13 @@ class PostController extends Controller
             ->limit(3)->get();
 
         return view('posts.show', compact('seo', 'post', 'related'));
+    }
+
+    /**
+     * Bản demo tĩnh không phân trang được bằng query string nên hiện tất cả trên một trang.
+     */
+    private static function perPage(int $default): int
+    {
+        return config('app.static_demo') ? 1000 : $default;
     }
 }

@@ -3,6 +3,7 @@ import { ADMIN_STATE } from './helpers.js';
 import { shot, watchErrors } from './helpers.js';
 
 test.use({ storageState: ADMIN_STATE });
+test.skip(!!process.env.STATIC_BASE_URL, 'Đang kiểm bản tĩnh');
 
 test.describe('admin', () => {
     test.beforeEach(({}, testInfo) => {

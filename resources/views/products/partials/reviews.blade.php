@@ -5,6 +5,7 @@
             <x-stars :rating="$product->rating_average" size="size-5" class="mt-2" />
             <p class="mt-1 text-sm text-gray-500">{{ $product->rating_count }} đánh giá</p>
         </div>
+        @unless (config('app.static_demo'))
         <form action="{{ route('reviews.store', $product) }}" method="POST" class="mt-6 space-y-4" x-data="{ rating: {{ old('rating', 5) }} }">
             @csrf
             <h3 class="font-bold">Viết đánh giá của bạn</h3>
@@ -24,6 +25,7 @@
             <div><textarea name="content" rows="4" placeholder="Chia sẻ trải nghiệm của bạn (tối thiểu 10 ký tự) *" required class="input">{{ old('content') }}</textarea>@error('content')<p class="field-error">{{ $message }}</p>@enderror</div>
             <button class="btn-primary w-full">Gửi đánh giá</button>
         </form>
+        @endunless
     </div>
     <div class="lg:col-span-3">
         @forelse ($reviews as $review)

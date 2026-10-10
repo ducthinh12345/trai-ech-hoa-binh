@@ -2,10 +2,13 @@
 
 namespace App\Providers;
 
+use App\Http\Controllers\SitemapController;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -26,6 +29,16 @@ class AppServiceProvider extends ServiceProvider
             ->defaultDateDisplayFormat('d/m/Y')->defaultDateTimeDisplayFormat('d/m/Y H:i'));
 
         Paginator::defaultView('pagination.shop');
+
+        /* @staticdemo ... @else ... @endstaticdemo: rẽ nhánh giao diện cho bản demo tĩnh. */
+        Blade::if('staticdemo', fn (): bool => (bool) config('app.static_demo'));
+
+        if (config('app.static_demo')) {
+            URL::forceRootUrl(rtrim((string) config('app.url'), '/'));
+            if (str_starts_with((string) config('app.url'), 'https://')) {
+                URL::forceScheme('https');
+            }
+        }
     }
 
     /**
@@ -33,7 +46,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public static function flushStorefrontCache(): void
     {
-        foreach (['menu.categories', 'footer.pages', 'footer.categories', 'sitemap.xml'] as $key) {
+        foreach (['menu.categories', 'footer.pages', 'footer.categories', SitemapController::cacheKey()] as $key) {
             Cache::forget($key);
         }
     }

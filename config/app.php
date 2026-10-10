@@ -85,6 +85,12 @@ return [
     'faker_locale' => env('APP_FAKER_LOCALE', 'en_US'),
 
     /*
+     * Bản demo tĩnh (GitHub Pages): ẩn mọi tính năng cần server (giỏ, thanh toán, form, tài khoản)
+     * và sinh URL tuyệt đối theo APP_URL để chạy được dưới đường dẫn con /<repo>/.
+     */
+    'static_demo' => (bool) env('STATIC_DEMO', false),
+
+    /*
     |--------------------------------------------------------------------------
     | Encryption Key
     |--------------------------------------------------------------------------
