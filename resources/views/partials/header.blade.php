@@ -10,7 +10,7 @@
             /* Mục cha sáng khi đang ở chính nó hoặc ở một danh mục con. */
             'isActive' => collect([$c['slug'], ...array_column($c['children'], 'slug')])->contains(fn ($slug) => request()->is('danh-muc/'.$slug)),
         ]);
-    $phone = setting('store_phone', '0900000000');
+    $phone = setting('store_phone', '0383 426 236');
 @endphp
 <header x-data="{ mobileOpen: false, searchOpen: false }" x-effect="document.documentElement.classList.toggle('overflow-hidden', mobileOpen)" class="sticky top-0 z-40">
     @if ($announcement = setting('announcement_text'))
