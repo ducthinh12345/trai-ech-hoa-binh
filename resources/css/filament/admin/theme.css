@@ -1,0 +1,12 @@
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+
+@source '../../../../app/Filament/**/*';
+@source '../../../../resources/views/filament/**/*';
+
+/* Bo góc mềm và khoảng thở rộng hơn một chút để người không chuyên dễ nhìn, dễ bấm. */
+.fi-section {
+    border-radius: 1rem;
+}
+.fi-sidebar-item-label {
+    font-size: 0.925rem;
+}

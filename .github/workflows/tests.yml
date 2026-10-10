@@ -1,0 +1,44 @@
+name: Tests
+
+# Chạy test mỗi lần push/PR. Miễn phí với repo public trên GitHub Actions.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  phpunit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, intl, pdo_sqlite, gd, zip, bcmath
+          coverage: none
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Cài dependency
+        run: |
+          composer install --no-interaction --prefer-dist --no-progress
+          npm ci
+
+      # View dùng @vite nên test cần manifest của bản build.
+      - name: Build asset
+        run: npm run build
+
+      - name: Chuẩn bị môi trường
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      - name: PHPUnit (SQLite in-memory)
+        run: php artisan test --compact
+
+      - name: Pint
+        run: vendor/bin/pint --test
